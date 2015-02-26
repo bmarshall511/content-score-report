@@ -1,0 +1,54 @@
+/**
+  * Theme mixins.
+  *
+  * @partial init
+  */
+
+// Property Rem
+// Outputs cross-browser compatible property definitions.
+@mixin rem-property($property, $values, $suffix: false, $prefix: false) {
+  $rem: ();
+  $px: ();
+
+  @each $value in $values {
+    @if $value == 0 or $value == auto {
+      $px : append($px, $value);
+      $rem: append($rem, $value);
+    }
+    @else {
+      $unit: unit($value);
+      $val: parseInt($value);
+
+      @if $unit == "px" {
+        $px : append($px, $value);
+        $rem: append($rem, convert-to-rem($value));
+      }
+
+      @if $unit == "rem" {
+        $px : append($px, convert-to-px($value));
+        $rem: append($rem, $value);
+      }
+    }
+  }
+
+  @if $suffix {
+    $px: append($px, $suffix);
+    $rem: append($rem, $suffix);
+  }
+
+  @if $prefix {
+    $px: prepend($px, $suffix);
+    $rem: prepend($rem, $suffix);
+  }
+
+  @if $px == $rem {
+    #{$property}: $px;
+  } @else {
+    @if $legacy-support {
+      #{$property}: $px;
+    }
+    @else {
+      #{$property}: $rem;
+    }
+  }
+}

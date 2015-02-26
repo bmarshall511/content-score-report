@@ -1,0 +1,19 @@
+/**
+  * Grid styles.
+  *
+  * @partial init
+  */
+
+.wrapper {
+  // Mobile
+  @include container;
+  @include rem-property(padding, 0 20px);
+}
+
+@include susy-breakpoint($tablet-breakpoint) {
+  @for $i from 1 through $num-columns {
+    .grid-#{$i} {
+      @include span($i);
+    }
+  }
+}

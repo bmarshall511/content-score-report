@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en" ng-app="content-score-report" ng-controller="mainController as mainCtrl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Content Score Report | Ben Marshall</title>
+</head>
+<body>
+
+<header class="header">
+  <div class="wrapper">
+    <div class="grid-1">
+      <i class="icon-menu"></i>
+    </div>
+    <div class="grid-1">
+      <h1 class="txt-center">Content Score Report</h1>
+    </div>
+    <div class="grid-1 txt-right">
+      <a href><i class="icon-github"></i> Fork on GitHub</a>
+    </div>
+  </div>
+</header>
+<section ng-controller="formController as formCtrl">
+  <div class="form__ga-authorize" ng-if="gaURL" ng-click="formCtrl.connect()"><div class="wrapper"><div class="grid-3">Click here to authorize &#10141;</div></div></div>
+  <div class="wrapper">
+    <div class="grid-2">
+    	<h2>Overview</h2>
+      <p><b>Sending email notifications to subscribers through MailChimp when articles are published?</b> The <a href>Content Score Report</a> helps provide insight on the performance of those articles using open rates from MailChimp and traffic data from Google Analytics.</p>
+    	<p><a href class="btn"><i class="icon-bug"></i></a> <a href class="btn"><i class="icon-share"></i></a></p>
+      <form ng-submit="formCtrl.submit()">
+
+        <div class="form__errors wrapper" ng-if="errors.length > 0 || !gaConnection">
+        	<div class="grid-3">
+	        	<h3 class="headline"><i class="icon-attention-circled"></i> Attention!</h3>
+		        <ul>
+		        	<li ng-if="!gaConnection">You need to <a href="#" ng-click="formCtrl.connect()">authorize the Content Score Report</a> app to access your Google Analytics data.
+		        	</li><li ng-repeat="error in errors">{{ error }}
+		        </li></ul>
+		       </div>
+	      </div>
+
+	      <div class="wrapper">
+	      	<div class="grid-2">
+		        <div class="form__field wrapper">
+		          <div class="grid-1"><label for="viewID">GA View ID <i class="icon-info-circled" ng-mouseover="tip = 1"></i></label></div>
+		          <div class="grid-2"><input type="text" name="viewID" placeholder="Enter your Google Analytics view ID." ng-model="form.viewID"></div>
+		        </div>
+
+		        <div class="form__field wrapper">
+		          <div class="grid-1"><label for="mcAPI">MailChimp API Key <i class="icon-info-circled" ng-mouseover="tip = 2"></i></label></div>
+		          <div class="grid-2"><input type="text" name="mcAPI" placeholder="Enter your MailChimp API key." ng-model="form.mcAPI"></div>
+		        </div>
+
+		        <div class="form__field wrapper">
+		          <div class="grid-1"><label for="mcID">MailChimp Campaign ID <i class="icon-info-circled" ng-mouseover="tip = 3"></i></label></div>
+		          <div class="grid-2"><input type="text" name="mcID" placeholder="Enter the MailChimp campaign ID." ng-model="form.mcID"></div>
+		        </div>
+
+		        <div class="form__field wrapper">
+		          <div class="grid-1"><label for="path">Path <em>ex. /example/path</em></label></div>
+		          <div class="grid-2"><input type="text" name="path" placeholder="Enter the path of your URL." ng-model="form.path"></div>
+		        </div>
+
+		        <div class="form__field wrapper">
+		          <div class="grid-1"><label for="startDate">Start Date</label></div>
+		          <div class="grid-2"><input type="date" name="startDate" ng-model="form.startDate"></div>
+		        </div>
+
+		        <div class="form__field wrapper">
+		          <div class="grid-1"><label for="endDate">End Date</label></div>
+		          <div class="grid-2"><input type="date" name="endDate" ng-model="form.endDate"></div>
+		        </div>
+
+		        <div class="wrapper"><div class="grid-3 txt-right"><input type="submit" value="Calculate" class="btn"></div></div>
+		      </div>
+
+	        <div class="grid-1">
+	        	<div ng-switch="tip">
+	        		<div ng-switch-when="1">
+			        	<h3>GA View ID</h3>
+			        	<ol>
+			        		<li>Log in to your account &amp; click '<b>All Web Site Data</b>' under site's account.
+			        		</li><li>Then click the '<b>Admin</b>' link at the top of the page.
+			        		</li><li>Under the '<b>View</b>' column, select your view, then click '<b>View Settings</b>'
+			        	</li></ol>
+			        	<p>There you will find your 'View ID' listed.</p>
+			        </div>
+			        <div ng-switch-when="2">
+			        	<h3>MailChimp API Key</h3>
+			        	<p>To find your MailChimp API Key, click <a href="https://admin.mailchimp.com/account/api-key-popup" target="_blank">https://admin.mailchimp.com/account/api-key-popup</a>.</p>
+			        </div>
+			        <div ng-switch-when="3">
+			        	<h3>MailChimp Campaign ID</h3>
+			        	<p>Unfortunately, they don't make it easy. Unless you're using the API or a system that provides you the campaign ID, you'll need to <a href="http://mailchimp.com/contact/campaign-id/" target="_blank">follow these directions on MailChimp's website</a> to find the ID.
+			        </p></div>
+		        </div>
+	        </div>
+	      </div>
+
+        <div class="wrapper form__notice">
+			  	<div class="grid-3">
+			  		<h3 class="headline"><i class="icon-attention-circled"></i> Note</h3>
+			  		<ul>
+			  			<li>The Content Score Report needs access to read your Google Analytics and MailChimp account. No keys or other data is ever stored except on your browser for ease of use. Feel free to <a href>review the source code</a> for any security concerns.
+			  		</li></ul>
+			  	</div>
+			  </div>
+        </form>
+
+        <a href="#" ng-if="gaConnection" ng-click="formCtrl.deauthorize()">Deauthorize Google Account</a>
+    </div>
+    <div class="grid-1">
+    	<h3>Statistics</h3>
+    	<div class="wrapper stat">
+    		<div class="grid-2">Open Rate</div>
+    		<div class="grid-1">{{ mcData.open_rate_formatted }}%</div>
+    	</div>
+    	<div class="wrapper stat">
+    		<div class="grid-2">Average Time on Page</div>
+    		<div class="grid-1">{{ gaData.avg_time_formatted }}</div>
+    	</div>
+    	<div class="wrapper stat">
+    		<div class="grid-2">Unique Pageviews</div>
+    		<div class="grid-1">{{ gaData.unique_pageviews }}</div>
+    	</div>
+
+    	<h3>Content Scores <em>(out of 50)</em></h3>
+    	<div class="wrapper stat">
+    		<div class="grid-2">Open Rate Score</div>
+    		<div class="grid-1">{{ retention.open_rate_score }}</div>
+    	</div>
+    	<div class="wrapper stat">
+    		<div class="grid-2">Pageviews Score</div>
+    		<div class="grid-1">{{ retention.pageviews_score }}</div>
+    	</div>
+    	<div class="wrapper stat">
+    		<div class="grid-2">Time on Page Score</div>
+    		<div class="grid-1">{{ retention.avg_time_score }}</div>
+    	</div>
+    	<div class="wrapper stat">
+    		<div class="grid-2">Average Score</div>
+    		<div class="grid-1">{{ retention.avg_score }}</div>
+    	</div>
+    </div>
+  </div>
+</section>
+<footer class="footer">
+	<div class="wrapper">
+		<div class="grid-3">
+			<p>Another most excellent app built by <a href="https://highfivery.com" target="_blank" class="footer__logo"></a></p>
+			<p>The Content Score Report was built by <a href="http://www.benmarshall.me" target="_blank">Ben Marshall</a>, hosted and maintained by <a href="https://highfivery.com" target="_blank">Highfivery</a>. Feel free to contribute by forking it on GitHub.<br>
+			<a href="https://plus.google.com/+Highfivery" target="_blank"><i class="icon-gplus"></i></a>
+			<a href="https://www.facebook.com/pages/Highfivery/936579066357372" target="_blank"><i class="icon-facebook"></i></a>
+			<a href="https://twitter.com/highfivery" target="_blank"><i class="icon-twitter"></i></a></p>
+		</div>
+	</div>
+</footer>
+<script src="assets/js/app.js" async></script>
+</body>
+</html>

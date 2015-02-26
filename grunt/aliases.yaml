@@ -1,0 +1,18 @@
+default:
+    - 'shell:clean'
+    - 'jshint'
+    - 'uglify:dev'
+    - 'compass:dev'
+    - 'copy:dev'
+    - 'imagemin:dev'
+    - 'htmlmin:dev'
+    - 'watch'
+
+prod:
+    - 'shell:clean'
+    - 'jshint'
+    - 'uglify:prod'
+    - 'compass:prod'
+    - 'copy:prod'
+    - 'imagemin:dev'
+    - 'htmlmin:prod'

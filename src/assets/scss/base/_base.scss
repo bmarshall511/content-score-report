@@ -1,0 +1,59 @@
+/**
+  * Base styles.
+  *
+  * @partial init
+  */
+
+// Create a vertical rhythm for the theme.
+@include establish-baseline;
+
+// Set the global box sizing.
+@include border-box-sizing;
+
+* {
+  outline: none;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-family;
+  color: $font-color;
+  background: #fcfcfc;
+  color: #404040;
+}
+
+ol {
+	list-style-type: decimal;
+
+	li {
+		@include rem-property(margin-left, 20px);
+	}
+}
+
+a {
+  color: $primary-color;
+  text-decoration: none;
+}
+
+em {
+	font-style: italic;
+}
+
+b {
+  font-weight: bold;
+}
+
+h1,
+h2,
+h3,
+p {
+  @include rhythm-margins;
+}
+
+h2 {
+  @include adjust-font-size-to(21px);
+}
+
+h3 {
+  @include adjust-font-size-to(19px);
+}

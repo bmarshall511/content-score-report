@@ -1,0 +1,30 @@
+/**
+  * Stats styles.
+  *
+  * @partial init
+  */
+
+/* Components */
+.stat {
+	@include border-radius;
+  @include rem-property(margin-top, 15px);
+  @include rem-property(margin-bottom, 15px);
+  @include rem-property(padding, 20px);
+  background: $secondary-color;
+  color: #fff;
+
+  .grid-1 {
+  	text-align: right;
+  	font-weight: bold;
+  }
+}
+
+/* Elements */
+
+/* Modifiers */
+
+/* State */
+
+/* Skin */
+
+/* Responsive */

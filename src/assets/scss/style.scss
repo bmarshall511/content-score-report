@@ -1,0 +1,30 @@
+/**
+ *  Contains all style dependencies for the Stratfor theme.
+ */
+
+$rem-with-px-fallback:     false;
+$rhythm-unit:              "rem";
+$browser-minimum-versions: (
+                             'ie': "9"
+                           );
+
+/* Import Sass mixins, functions, variables, Compass modules, etc. */
+@import "init";
+
+/* HTML element (SMACSS base) rules */
+@import "compass/reset";
+@import "base/base";
+@import "base/form";
+
+/* Layout rules */
+@import "layouts/grids";
+
+/* Component (SMACSS module) rules */
+@import "components/utility";
+@import "components/loading-bar";
+@import "components/form";
+@import "components/header";
+@import "components/footer";
+@import "components/buttons";
+@import "components/stats";
+@import "components/icons";

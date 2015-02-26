@@ -1,0 +1,49 @@
+/**
+  * Theme variables.
+  *
+  * @partial init
+  */
+
+/* Theme Variables */
+
+// Fonts
+$font-family: 'Lato', sans-serif;
+
+// Colors:
+$font-color:      #333;
+$primary-color:   #2980B9;
+$secondary-color: #27AE60;
+$trinary-color:   #f0b37e;
+
+// Breakpoints
+$desktop-breakpoint: 960px;
+$tablet-breakpoint:  740px;
+
+
+/* Compass Variables */
+$base-font-size:              16px;
+$base-line-heght:             24px;
+$default-rhythm-border-width: 1px;
+$default-rhythm-border-style: solid;
+$round-to-nearest-half-line:  false;
+$min-line-padding:            2px;
+$default-border-radius:       (2 / 16) * 1rem;
+
+// Compass browser specific variables.
+$legacy-support:           false !default;
+$rem-with-px-fallback:     false !default;
+$rhythm-unit:              "rem" !default;
+$browser-minimum-versions: (
+                             'ie': "7"
+                           ) !default;
+
+/* Susy Variables */
+$num-columns:  3;
+
+$susy: (
+  columns:           $num-columns,
+  container:         auto,
+  gutters:           1/10,
+  gutter-position:   split,
+  global-box-sizing: border-box,
+);

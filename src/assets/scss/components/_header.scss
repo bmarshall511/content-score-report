@@ -1,0 +1,43 @@
+/**
+  * Header styles.
+  *
+  * @partial init
+  */
+
+/* Components */
+.header {
+  @include rem-property(padding-top, 10px);
+  @include rem-property(padding-bottom, 10px);
+  @include adjust-font-size-to(21px);
+  background: #343131;
+  color: #b3b3b3;
+
+  a {
+    color: $secondary-color;
+  }
+
+  h1 {
+    margin: 0;
+    font-weight: 300;
+  }
+
+  .grid-1:last-child {
+  	@include rem-property(font-size, $base-font-size);
+  }
+
+  @for $i from 1 through $num-columns {
+    .grid-#{$i} {
+      @include span($i);
+    }
+  }
+}
+
+/* Elements */
+
+/* Modifiers */
+
+/* State */
+
+/* Skin */
+
+/* Responsive */

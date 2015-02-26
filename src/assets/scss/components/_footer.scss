@@ -1,0 +1,37 @@
+/**
+  * Footer styles.
+  *
+  * @partial init
+  */
+
+
+/* Components */
+.footer {
+	@include rhythm-margins;
+	@include padding-leader;
+	background: #f9f9f9;
+	color: #999;
+	text-align: center;
+}
+
+/* Elements */
+.footer__logo {
+	display: inline-block;
+	vertical-align: text-top;
+	width: image-width('highfivery.png');
+	height: image-height('highfivery.png');
+	@include rem-property(background-size, image-width('highfivery.png') image-height('highfivery.png'));
+	background: image-url('highfivery.png') no-repeat;
+
+	@include breakpoint(min-resolution 1.5dppx) {
+		background-image: image-url('highfivery@2x.png');
+	}
+}
+
+/* Modifiers */
+
+/* State */
+
+/* Skin */
+
+/* Responsive */

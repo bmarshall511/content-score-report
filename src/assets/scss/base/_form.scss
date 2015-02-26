@@ -1,0 +1,31 @@
+/**
+  * Base form styles.
+  *
+  * @partial init
+  */
+
+form {
+	display: block;
+	@include border-radius;
+	@include rem-property(margin-top, 20px);
+	@include rem-property(padding, 20px 0);
+	@include rem-property(border, 1px, solid #e1e4e5);
+	background: #fff;
+	color: #404040;
+}
+
+input {
+  @include rem-property(border, 1px, solid #d5d5d5);
+  @include border-radius;
+  @include rem-property(font-size, $base-font-size);
+  font-family: $font-family;
+  font-weight: 300;
+  // Fix for default Safari styles.
+  -webkit-appearance: none
+}
+
+input[type='text'],
+input[type='date'] {
+  width: 100%;
+  @include rem-property(padding, 8px);
+}

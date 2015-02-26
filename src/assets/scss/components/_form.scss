@@ -1,0 +1,84 @@
+/**
+  * Form styles.
+  *
+  * @partial init
+  */
+
+/* Components */
+
+
+/* Elements */
+.form__ga-authorize {
+  @include rem-property(padding, 15px 0);
+	cursor: pointer;
+  background: #f7991c;
+	color: #fff;
+	@include single-transition(background-color, .5s);
+
+	&:hover {
+		background-color: #f05721;
+	}
+
+  .grid-3 {
+    @include rem-property(padding-left, 30px);
+    background: image-url('ga.svg') no-repeat left center;
+    @include rem-property(background-size, 20px 20px);
+  }
+}
+
+.form__field {
+	@include rem-property(line-height, 37px);
+  @include rem-property(margin-top, 15px);
+  @include rem-property(margin-bottom, 15px);
+
+  .icon-info-circled {
+  	color: #999;
+  }
+}
+
+.form__errors,
+.form__notice {
+	@include margin-trailer;
+
+	.headline {
+		display: block;
+		margin: 0;
+		@include rem-property(padding, 5px 15px);
+		color: #fff;
+	}
+
+	ul {
+		display: block;
+		@include rem-property(padding, 10px 15px);
+	}
+}
+
+.form__errors {
+	.headline {
+		background: $trinary-color;
+	}
+
+	ul {
+		background: lighten($trinary-color, 20%);
+	}
+}
+
+.form__notice {
+	@include margin-leader;
+
+	.headline {
+		background: lighten($primary-color, 20%);
+	}
+
+	ul {
+		background: lighten($primary-color, 50%);
+	}
+}
+
+/* Modifiers */
+
+/* State */
+
+/* Skin */
+
+/* Responsive */
