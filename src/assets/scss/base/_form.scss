@@ -8,7 +8,7 @@ form {
 	display: block;
 	@include border-radius;
 	@include rem-property(margin-top, 20px);
-	@include rem-property(padding, 20px 0);
+	@include rem-property(padding, 20px);
 	@include rem-property(border, 1px, solid #e1e4e5);
 	background: #fff;
 	color: #404040;

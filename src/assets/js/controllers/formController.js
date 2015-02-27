@@ -11,8 +11,8 @@
       'mcAPI'    : localStorage.getItem( "mcAPI" ) == 'null' ? '' : localStorage.getItem( "mcAPI" ),
       'path'     : localStorage.getItem( "path" ) == 'null' ? '' : localStorage.getItem( "path" ),
       'mcID'     : localStorage.getItem( "mcID" ) == 'null' ? '' : localStorage.getItem( "mcID" ),
-      'startDate': localStorage.getItem( "startDate" ) == 'null' ? '' : localStorage.getItem( "startDate" ),
-      'endDate'  : localStorage.getItem( "endDate" ) == 'null' ? '' : localStorage.getItem( "endDate" )
+      'startDate': localStorage.getItem( "startDate" ) == 'null' ? startDate : new Date( localStorage.getItem( "startDate" ) ),
+      'endDate'  : localStorage.getItem( "endDate" ) == 'null' ? endDate : new Date( localStorage.getItem( "endDate" ) )
     };
 
     $scope.retention = {

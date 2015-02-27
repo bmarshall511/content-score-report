@@ -1,11 +1,16 @@
 var app = angular.module( 'content-score-report', [
 	'angular-loading-bar',
 	'angularLoad'
-] );
+]);
 
 var scores = {
   retention: {}
 };
+
+ var startDate = new Date(),
+     endDate = new Date();
+
+startDate.setFullYear( endDate.getFullYear() - 1 );
 
 function trackEvent( category, action, label ) {
 	var send = {

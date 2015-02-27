@@ -5,7 +5,7 @@
   */
 
 /* Components */
-.stat {
+.stat.wrapper {
 	@include border-radius;
   @include rem-property(margin-top, 15px);
   @include rem-property(margin-bottom, 15px);
