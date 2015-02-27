@@ -11,5 +11,4 @@
     angularLoad.loadCSS( '//fonts.googleapis.com/css?family=Lato:300,400,700,400italic' );
 	  angularLoad.loadCSS( 'assets/css/style.css' );
 	});
-
 })( jQuery );

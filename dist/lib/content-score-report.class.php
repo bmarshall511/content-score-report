@@ -22,6 +22,12 @@ class Content_Score_Report {
 		return $return;
 	}
 
+	public function deauthorizeGA() {
+		$_SESSION['access_token'] = false;
+		session_destroy();
+		$result = $this->authenticateGA();
+	}
+
 	public function authenticateGA( $code = false ) {
 		$return = array(
 			'connected' => false,

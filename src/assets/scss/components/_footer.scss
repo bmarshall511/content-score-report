@@ -7,9 +7,9 @@
 
 /* Components */
 .footer {
-	@include rhythm-margins;
-	@include padding-leader;
-	background: #f9f9f9;
+	@include margin-leader;
+	@include rhythm-padding;
+	background: #efefef;
 	color: #999;
 	text-align: center;
 }
@@ -25,6 +25,15 @@
 
 	@include breakpoint(min-resolution 1.5dppx) {
 		background-image: image-url('highfivery@2x.png');
+	}
+}
+
+.footer__social {
+	margin-bottom: 0;
+	@include rem-property(font-size, 22px);
+
+	a {
+		color: #999;
 	}
 }
 

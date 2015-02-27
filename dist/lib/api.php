@@ -23,7 +23,7 @@ $csr = new Content_Score_Report( $config );
 if( isset( $_GET['code'] ) ) {
   $csr->authenticateGA( $_GET['code'] );
 
-  header( "Location: " . "/content-score-report/dev/" );
+  header( "Location: " . $config['project_path'] );
 }
 
 $method = isset( $_POST['method'] ) ? trim( strip_tags( $_POST['method'] ) ) : false;
@@ -52,8 +52,7 @@ if( $method ) {
       $return = $csr->getScore( $args );
     break;
     case 'deauthorize':
-      session_destroy();
-
+    	$csr->deauthorizeGA();
       $result = $csr->checkConnections();
 
       $return['gaConnection'] = $result['gaConnection'];
@@ -67,7 +66,3 @@ if( $method ) {
   echo json_encode( $return );
 }
 die();
-
-
-
-

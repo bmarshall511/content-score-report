@@ -46,6 +46,8 @@
     }
 
     this.connect = function() {
+    	trackEvent( "Content Score Report", "GA Authorization" );
+
       window.location.replace( $scope.gaURL );
     };
 
@@ -54,6 +56,8 @@
       var send = {
         'method': 'deauthorize'
       };
+
+      trackEvent( "Content Score Report", "GA Deauthorization" );
 
       console.log( "Deauthorizing account..." );
       _apiCall( send, function( data ) {
@@ -90,6 +94,8 @@
         'startDate' : $scope.form.startDate,
         'endDate'   : $scope.form.endDate,
       };
+
+      trackEvent( "Content Score Report", "Form Submitted", "Retention" );
 
       localStorage.setItem( "viewID", $scope.form.viewID );
       localStorage.setItem( "mcAPI", $scope.form.mcAPI );

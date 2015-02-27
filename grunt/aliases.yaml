@@ -14,5 +14,5 @@ prod:
     - 'uglify:prod'
     - 'compass:prod'
     - 'copy:prod'
-    - 'imagemin:dev'
+    - 'imagemin:prod'
     - 'htmlmin:prod'

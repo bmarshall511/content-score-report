@@ -11,3 +11,11 @@
 .txt-right {
   text-align: right;
 }
+
+.tablet {
+	display: none;
+
+	@include susy-breakpoint($tablet-breakpoint) {
+		display: inline;
+	}
+}

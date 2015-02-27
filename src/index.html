@@ -3,20 +3,42 @@
 <head>
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-<title>Content Score Report | Ben Marshall</title>
+<title>Content Score Report | Highfivery</title>
+
+<meta name='description' content='Send emails through MailChimp when new articles are published? Get performance insight using traffic metrics with the Content Score Report.'>
+
+<meta property='og:title' content='Performance Insight with the Content Score Report'>
+<meta property='og:description' content='Send emails through MailChimp when new articles are published? Get performance insight using traffic metrics with the Content Score Report.'>
+<meta property='og:type' content='website'>
+<meta property='og:url' content='https://highfivery.com/sandbox/content-score-report/'>
+<meta property='og:image' content='https://highfivery.com/assets/img/og.jpg'>
+<meta property='og:site_name' content='Highfivery'>
+
+<meta name='twitter:card' value='summary_large_image'>
+<meta name='twitter:site' content='@highfivery'>
+<meta name='twitter:url' content='https://highfivery.com/sandbox/content-score-report/'>
+<meta name='twitter:domain' content='https://highfivery.com'>
+<meta name='twitter:title' content='Performance Insight with the Content Score Report'>
+<meta name='twitter:description' content='Send emails through MailChimp when new articles are published? Get performance insight using traffic metrics with the Content Score Report.'>
+<meta name='twitter:creator' content='@highfivery'>
+<meta name='twitter:image:src' content='https://highfivery.com/assets/img/og.jpg'>
+
+<meta itemprop='name' content='Performance Insight with the Content Score Report'>
+<meta itemprop='description' content='Send emails through MailChimp when new articles are published? Get performance insight using traffic metrics with the Content Score Report.'>
+<meta itemprop='image' content='https://highfivery.com/assets/img/og.jpg'>
+
+<meta property='fb:admins' content='1269453461'>
+<style>.loading{display:block;position:fixed;top:0;left:0;width:100%;height:100%;background:#fff}</style>
 </head>
 <body>
-
+<div class='loading'></div>
 <header class='header'>
   <div class='wrapper'>
-    <div class='grid-1'>
-      <i class='icon-menu'></i>
-    </div>
-    <div class='grid-1'>
-      <h1 class='txt-center'>Content Score Report</h1>
+    <div class='grid-2'>
+      <h1>Content Score Report</h1>
     </div>
     <div class='grid-1 txt-right'>
-      <a href=''><i class='icon-github'></i> Fork on GitHub</a>
+      <a href='https://github.com/bmarshall511/content-score-report' target='_blank'><i class='icon-github'></i><span class='tablet'> Fork on GitHub</span></a>
     </div>
   </div>
 </header>
@@ -25,8 +47,11 @@
   <div class='wrapper'>
     <div class='grid-2'>
     	<h2>Overview</h2>
-      <p><b>Sending email notifications to subscribers through MailChimp when articles are published?</b> The <a href=''>Content Score Report</a> helps provide insight on the performance of those articles using open rates from MailChimp and traffic data from Google Analytics.</p>
-    	<p><a href='' class='btn'><i class='icon-bug'></i></a> <a href='' class='btn'><i class='icon-share'></i></a></p>
+      <p><b>Sending email notifications to subscribers through MailChimp when articles are published?</b> The <a href='https://highfivery.com/sandbox/content-score-report'>Content Score Report</a> helps provide insight on the performance of those articles using open rates from MailChimp and traffic data from Google Analytics.</p>
+    	<p>
+    		<a href='https://github.com/bmarshall511/content-score-report/issues' target='_blank' class='btn'><i class='icon-bug'></i></a>
+    		<a href='#' ng-if='gaConnection' ng-click='formCtrl.deauthorize()' class='btn'>Deauthorize Google Account</a>
+    	</p>
       <form ng-submit='formCtrl.submit()'>
 
         <div class='form__errors wrapper' ng-if='errors.length > 0 || !gaConnection'>
@@ -71,7 +96,11 @@
 		          <div class='grid-2'><input type='date' name='endDate' ng-model='form.endDate'></div>
 		        </div>
 
-		        <div class='wrapper'><div class='grid-3 txt-right'><input type='submit' value='Calculate' class='btn'></div></div>
+		        <div class='wrapper'>
+		        	<div class='grid-3 txt-right'>
+		        		<input type='submit' value='Calculate' class='btn'>
+		        	</div>
+		       	</div>
 		      </div>
 
 	        <div class='grid-1'>
@@ -101,13 +130,11 @@
 			  	<div class='grid-3'>
 			  		<h3 class='headline'><i class='icon-attention-circled'></i> Note</h3>
 			  		<ul>
-			  			<li>The Content Score Report needs access to read your Google Analytics and MailChimp account. No keys or other data is ever stored except on your browser for ease of use. Feel free to <a href=''>review the source code</a> for any security concerns.
+			  			<li>The Content Score Report needs access to read your Google Analytics and MailChimp account. No keys or other data is ever stored except on your browser for ease of use. Feel free to <a href='https://github.com/bmarshall511/content-score-report' target='_blank'>review the source code</a> for any security concerns.
 			  		</ul>
 			  	</div>
 			  </div>
         </form>
-
-        <a href='#' ng-if='gaConnection' ng-click='formCtrl.deauthorize()'>Deauthorize Google Account</a>
     </div>
     <div class='grid-1'>
     	<h3>Statistics</h3>
@@ -147,9 +174,8 @@
 <footer class='footer'>
 	<div class='wrapper'>
 		<div class='grid-3'>
-			<p>Another most excellent app built by <a href='https://highfivery.com' target='_blank' class='footer__logo'></a></p>
-			<p>The Content Score Report was built by <a href='http://www.benmarshall.me' target='_blank'>Ben Marshall</a>, hosted and maintained by <a href='https://highfivery.com' target='_blank'>Highfivery</a>. Feel free to contribute by forking it on GitHub.<br>
-			<a href='https://plus.google.com/+Highfivery' target='_blank'><i class='icon-gplus'></i></a>
+			<p>Built by <a href='http://www.benmarshall.me' target='_blank'>Ben Marshall</a>, hosted and provided by <a href='https://highfivery.com' target='_blank' class='footer__logo'></a>.</p>
+			<p class='footer__social'><a href='https://plus.google.com/+Highfivery' target='_blank'><i class='icon-gplus'></i></a>
 			<a href='https://www.facebook.com/pages/Highfivery/936579066357372' target='_blank'><i class='icon-facebook'></i></a>
 			<a href='https://twitter.com/highfivery' target='_blank'><i class='icon-twitter'></i></a></p>
 		</div>

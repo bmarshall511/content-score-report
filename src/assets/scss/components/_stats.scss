@@ -17,6 +17,12 @@
   	text-align: right;
   	font-weight: bold;
   }
+
+  @for $i from 1 through $num-columns {
+    .grid-#{$i} {
+      @include span($i);
+    }
+  }
 }
 
 /* Elements */

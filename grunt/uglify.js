@@ -6,6 +6,7 @@ var scripts = [
     'src/assets/js/config.js',
     'src/assets/js/controllers/mainController.js',
     'src/assets/js/controllers/formController.js',
+    'src/assets/js/lib/ga.js',
 ];
 
 module.exports = {
