@@ -2,6 +2,10 @@
 
 class Content_Score_Report {
 	var $client;
+  var $viewID;
+  var $startDate;
+  var $endDate;
+  var $type;
 
 	public function __construct( $config ) {
 		$this->config = $config;
@@ -15,9 +19,9 @@ class Content_Score_Report {
 		);
 
 		// Connect to the GA API.
-		$result = $this->authenticateGA();
+		$result                 = $this->authenticateGA();
 		$return['gaConnection'] = $result['connected'];
-		$return['gaURL'] = $result['url'];
+		$return['gaURL']        = $result['url'];
 
 		return $return;
 	}
@@ -45,12 +49,13 @@ class Content_Score_Report {
 			$this->client->setAccessToken( $_SESSION['access_token'] );
 
 			if( $this->client->isAccessTokenExpired() ) {
-      	$this->client->authenticate();
+      	/*$this->client->authenticate();
       	$newToken = json_decode( $this->client->getAccessToken() );
-       	$this->client->refreshToken( $newToken->refresh_token );
-    	}
-
-    	$return['connected'] = true;
+       	$this->client->refreshToken( $newToken->refresh_token );*/
+        $return['url'] = $this->client->createAuthUrl();
+    	} else {
+        $return['connected'] = true;
+      }
 		} else {
 			$return['url'] = $this->client->createAuthUrl();
 		}
@@ -59,11 +64,16 @@ class Content_Score_Report {
 	}
 
 	public function getScore( $args ) {
+    $this->viewID    = $args['viewID'];
+    $this->startDate = $args['startDate'];
+    $this->endDate   = $args['endDate'];
+    $this->type      = $args['type'];
+
 		$return = array(
-			"errors"          => array(),
-			"gaData"          => array(),
-			"mcData"          => array(),
-			"retention_score" => array()
+			"errors" => array(),
+			"gaData" => array(),
+			"mcData" => array(),
+			"score"  => array()
 		);
 
 		foreach( $args as $key => $val ) {
@@ -74,132 +84,247 @@ class Content_Score_Report {
 
 		if( ! count( $return['errors'] ) ) {
 
-			// Get data from Google Analytics.
-			try {
-				$connect = $this->authenticateGA();
-				if( $connect['connected'] ) {
+      // Get pageviews from Google Analytics.
+      $result = $this->_gaCall( array( 'type' => 'pageviews', 'path' => $args['path'] ) );
+      $return['errors']              = $return['errors'] + $result['errors'];
+      $return['gaData']['pageviews'] = $result['data'];
 
-					$analytics    = new Google_Service_Analytics( $this->client );
-					$analytics_id = 'ga:' . $args['viewID'];
+      switch( $this->type ) {
+        case 'retention':
+          // Get data from MailChimp.
+          $MailChimp = new \drewm\MailChimp( $args['mcAPI'] );
 
-					$optParams = array();
-		      $optParams['filters'] = "ga:pagePath==" . $args['path'];
-		      $metrics              = 'ga:uniquePageviews,ga:avgTimeOnPage';
-		      $result               = $analytics->data_ga->get( $analytics_id,
-		                              date( 'Y-m-d', strtotime( $args['startDate'] ) ),
-		                              date( 'Y-m-d', strtotime( $args['endDate'] ) ), $metrics, $optParams);
+          $return['mcData'] = $this->_parseMCData( $MailChimp->call( 'reports/summary', array(
+            'cid' => $args['mcID']
+          )));
 
-		      if( $result->getRows() ) {
-		      	$results = $result->getRows();
+          // Calculate retention score.
+          if(
+            isset( $return['mcData']['open_rate'] ) && $return['mcData']['open_rate'] &&
+            isset( $return['gaData']['pageviews']['unique_pageviews'] ) && $return['gaData']['pageviews']['unique_pageviews'] &&
+            isset( $return['gaData']['pageviews']['avg_time'] ) && $return['gaData']['pageviews']['avg_time']
+          ) {
+            $return['score'] = $this->_calculateScore( array(
+              'open_rate'        => $return['mcData']['open_rate'],
+              'unique_pageviews' => $return['gaData']['pageviews']['unique_pageviews'],
+              'avg_time'         => $return['gaData']['pageviews']['avg_time']
+            ));
+          } else {
+            $return['errors'][] = "Not enough data to calculate the retention score.";
+          }
+        break;
+        case 'acquisition':
+          // Get events from Google Analytics.
+          $result = $this->_gaCall( array(
+            'type'     => 'events',
+            'category' => $args['category'],
+            'action'   => $args['action'],
+            'label'    => $args['label']
+          ));
+          $return['errors']           = $return['errors'] + $result['errors'];
+          $return['gaData']['events'] = $result['data'];
 
-		      	$metricsAry = explode( ",", $metrics );
-		      	foreach( $metricsAry as $key => $val ) {
-		      		$return['gaData'][$val] = $results[0][$key];
-		      	}
-
-		      	$return['gaData'] = $this->_parseGAData( $return['gaData'] );
-		      } else {
-		      	$return['errors'][] = "No data available.";
-		      }
-		    } else {
-		    	$return['errors'][] = "Not connected to the Google API.";
-		    }
-			} catch(Exception $e) {
-				$return['errors'][] = "There was an error : - " . $e->getMessage();
-	  	}
-
-	  	// Get data from MailChimp.
-  		$MailChimp = new \drewm\MailChimp( $args['mcAPI'] );
-
-  		$return['mcData'] = $this->_parseMCData( $MailChimp->call( 'reports/summary', array(
-    		'cid' => $args['mcID']
-  		)));
-
-  		// Calculate retention score.
-  		if(
-  			isset( $return['mcData']['open_rate'] ) && $return['mcData']['open_rate'] &&
-  			isset( $return['gaData']['unique_pageviews'] ) && $return['gaData']['unique_pageviews'] &&
-  			isset( $return['gaData']['avg_time'] ) && $return['gaData']['avg_time']
-  		) {
-	  		$return['retention_score'] = $this->_calculateRetentionScore( array(
-	  			'open_rate'        => $return['mcData']['open_rate'],
-	  			'unique_pageviews' => $return['gaData']['unique_pageviews'],
-	  			'avg_time'         => $return['gaData']['avg_time']
-	  		));
-	  	} else {
-	  		$return['errors'][] = "Not enough data to calculate the retention score.";
-	  	}
+          // Calculate acquisition score.
+          if(
+            isset( $return['gaData']['pageviews']['unique_pageviews'] ) && $return['gaData']['pageviews']['unique_pageviews'] &&
+            isset( $return['gaData']['pageviews']['avg_time'] ) && $return['gaData']['pageviews']['avg_time'] &&
+            isset( $return['gaData']['events']['unique_events'] ) && $return['gaData']['events']['unique_events']
+          ) {
+            $return['score'] = $this->_calculateScore( array(
+              'unique_pageviews' => $return['gaData']['pageviews']['unique_pageviews'],
+              'avg_time'         => $return['gaData']['pageviews']['avg_time'],
+              'unique_events'    => $return['gaData']['events']['unique_events']
+            ));
+          } else {
+            $return['errors'][] = "Not enough data to calculate the acquisition score.";
+          }
+        break;
+      }
 	  }
 
   	return $return;
 	}
 
-	private function _calculateRetentionScore( $data ) {
-		$return = array(
-    	'open_rate_score' => 0,
-    	'pageviews_score' => 0,
-    	'avg_time_score'  => 0
+  private function _gaCall( $args ) {
+    $return = array(
+      "errors"          => array(),
+      "data"          => array()
     );
+    $optParams = array();
 
-    // Calculate open rate score.
-    switch( $data['open_rate'] ) {
-    	case $data['open_rate'] < 38:
-    		$return['open_rate_score'] = 10;
-    	break;
-    	case $data['open_rate'] >= 38 && $data['open_rate'] <= 41:
-    		$return['open_rate_score'] = 20;
-    	break;
-    	case $data['open_rate'] > 41 && $data['open_rate'] <= 43:
-    		$return['open_rate_score'] = 30;
-    	break;
-    	case $data['open_rate'] > 43 && $data['open_rate'] <= 45:
-    		$return['open_rate_score'] = 40;
-    	break;
-    	case $data['open_rate'] > 45:
-    		$return['open_rate_score'] = 50;
-    	break;
+    switch( $args['type'] ) {
+      case 'pageviews':
+        $metrics              = 'ga:uniquePageviews,ga:avgTimeOnPage';
+        $optParams['filters'] = "ga:pagePath==" . $args['path'];
+      break;
+      case 'events':
+        $metrics               = 'ga:uniqueEvents';
+        $optParams['filters']  = "ga:eventCategory==" . $args['category'] . ";";
+        $optParams['filters'] .= "ga:eventAction==" . $args['action'] . ";";
+        $optParams['filters'] .= "ga:eventLabel==" . $args['label'];
+      break;
     }
 
-    // Calculate pageviews score.
-    switch( $data['unique_pageviews'] ) {
-    	case $data['unique_pageviews'] <= 50:
-    		$return['pageviews_score'] = 10;
-    	break;
-    	case $data['unique_pageviews'] > 50 && $data['unique_pageviews'] <= 200:
-    		$return['pageviews_score'] = 20;
-    	break;
-    	case $data['unique_pageviews'] > 200 && $data['unique_pageviews'] <= 475:
-    		$return['pageviews_score'] = 30;
-    	break;
-    	case $data['unique_pageviews'] > 475 && $data['unique_pageviews'] <= 750:
-    		$return['pageviews_score'] = 40;
-    	break;
-    	case $data['unique_pageviews'] > 750:
-    		$return['pageviews_score'] = 50;
-    	break;
-    }
+    try {
+      $connect = $this->authenticateGA();
 
-    // Calculate average time on page score.
-    switch( $data['avg_time'] ) {
-    	case $data['avg_time'] <= 60:
-    		$return['avg_time_score'] = 10;
-    	break;
-    	case $data['avg_time'] > 60 && $data['avg_time'] <= 180:
-    		$return['avg_time_score'] = 20;
-    	break;
-    	case $data['avg_time'] > 180 && $data['avg_time'] <= 240:
-    		$return['avg_time_score'] = 30;
-    	break;
-    	case $data['avg_time'] > 240 && $data['avg_time'] <= 300:
-    		$return['avg_time_score'] = 40;
-    	break;
-    	case $data['avg_time'] > 300:
-    		$return['avg_time_score'] = 50;
-    	break;
+      if( $connect['connected'] ) {
+
+        $analytics    = new Google_Service_Analytics( $this->client );
+        $analytics_id = 'ga:' . $this->viewID;
+        $result       = $analytics->data_ga->get( $analytics_id,
+                        date( 'Y-m-d', strtotime( $this->startDate ) ),
+                        date( 'Y-m-d', strtotime( $this->endDate ) ), $metrics, $optParams);
+
+        if( $result->getRows() ) {
+          $results = $result->getRows();
+
+          $metricsAry = explode( ",", $metrics );
+          foreach( $metricsAry as $key => $val ) {
+            $return['data'][$val] = $results[0][$key];
+          }
+
+          $return['data'] = $this->_parseGAData( $return['data'] );
+        } else {
+          $return['errors'][] = "No data available.";
+        }
+      } else {
+        $return['errors'][] = "Not connected to the Google API.";
+      }
+    } catch(Exception $e) {
+      $return['errors'][] = "There was an error : - " . $e->getMessage();
     }
 
     return $return;
-	}
+  }
+
+  private function _openRateScore( $openRate ) {
+    switch( $openRate ) {
+      case $openRate < 38:
+        return 10;
+      break;
+      case $openRate >= 38 && $openRate <= 41:
+        return 20;
+      break;
+      case $openRate > 41 && $openRate <= 43:
+        return 30;
+      break;
+      case $openRate > 43 && $openRate <= 45:
+        return 40;
+      break;
+      case $openRate > 45:
+        return 50;
+      break;
+    }
+  }
+
+  private function _getScore( $num, $range ) {
+    switch( $num ) {
+      case $num <= $range[10]:
+        return 10;
+      break;
+      case $num > $range[10] && $num <= $range[20]:
+        return 20;
+      break;
+      case $num > $range[20] && $num <= $range[30]:
+        return 30;
+      break;
+      case $num > $range[30] && $num <= $range[40]:
+        return 40;
+      break;
+      case $num > $range[40]:
+        return 50;
+      break;
+    }
+  }
+
+  private function _pageviewsScore( $pageviews ) {
+    $ranges = array(
+      'retention' => array(
+        10 => 50,
+        20 => 200,
+        30 => 475,
+        40 => 750
+      ),
+      'acquisition' => array(
+        10 => 300,
+        20 => 400,
+        30 => 750,
+        40 => 1500
+      )
+    );
+
+    return $this->_getScore( $pageviews, $ranges[$this->type] );
+  }
+
+  private function _avgTimeScore( $time ) {
+    $ranges = array(
+      'retention' => array(
+        10 => 60,
+        20 => 180,
+        30 => 240,
+        40 => 300
+      ),
+      'acquisition' => array(
+        10 => 120,
+        20 => 210,
+        30 => 300,
+        40 => 420
+      )
+    );
+
+    return $this->_getScore( $time, $ranges[$this->type] );
+  }
+
+  private function _eventsScore( $events ) {
+    switch( $events ) {
+      case $events <= 15:
+        return 10;
+      break;
+      case $events > 15 && $events <= 30:
+        return 20;
+      break;
+      case $events > 30 && $events <= 60:
+        return 30;
+      break;
+      case $events > 60 && $events <= 110:
+        return 40;
+      break;
+      case $events > 110:
+        return 50;
+      break;
+    }
+  }
+
+  private function _calculateScore( $data ) {
+    $return = array(
+      'pageviews' => 0,
+      'avg_time'  => 0
+    );
+
+    switch( $this->type ) {
+      case 'retention':
+        $return['open_rate'] = 0;
+
+        // Calculate open rate score.
+        $return['open_rate'] = $this->_openRateScore( $data['open_rate'] );
+      break;
+      case 'acquisition':
+        $return['events'] = 0;
+
+        // Calculate events score.
+        $return['events'] = $this->_eventsScore( $data['unique_events'] );
+      break;
+    }
+
+    // Calculate pageviews score.
+    $return['pageviews'] = $this->_pageviewsScore( $data['unique_pageviews'] );
+
+    // Calculate average time on page score.
+    $return['avg_time'] = $this->_avgTimeScore( $data['avg_time'] );
+
+    return $return;
+  }
 
 	private function _parseMCData( $data ) {
 		$return = array();
@@ -230,9 +355,12 @@ class Content_Score_Report {
 					$key = "unique_pageviews";
 				break;
 				case "ga:avgTimeOnPage":
-					$key   = "avg_time";
+					$key                          = "avg_time";
 					$return['avg_time_formatted'] = $this->_toTime( $value );
 				break;
+        case "ga:uniqueEvents":
+          $key = "unique_events";
+        break;
 			}
 
 			$return[$key] = $value;

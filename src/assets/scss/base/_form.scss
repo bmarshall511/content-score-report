@@ -14,7 +14,10 @@ form {
 	color: #404040;
 }
 
-input {
+input[type='text'],
+input[type='date'] {
+  width: 100%;
+  @include rem-property(padding, 8px);
   @include rem-property(border, 1px, solid #d5d5d5);
   @include border-radius;
   @include rem-property(font-size, $base-font-size);
@@ -22,10 +25,4 @@ input {
   font-weight: 300;
   // Fix for default Safari styles.
   -webkit-appearance: none
-}
-
-input[type='text'],
-input[type='date'] {
-  width: 100%;
-  @include rem-property(padding, 8px);
 }
