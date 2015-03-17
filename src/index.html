@@ -65,26 +65,54 @@
 	      </div>
 
 	      <div class='wrapper'>
-	      	<div class='grid-2'>
+	      	<div class='grid-3'>
 		        <div class='form__field wrapper'>
-		          <div class='grid-1'><label for='viewID'>GA View ID <i class='icon-info-circled' ng-mouseover='tip = 1'></i></label></div>
+		          <div class='grid-1'><label for='viewID'>GA View ID</label></div>
 		          <div class='grid-2'><input type='text' name='viewID' placeholder='Enter your Google Analytics view ID.' ng-model='form.viewID'></div>
 		        </div>
 
-		        <div class='form__field wrapper'>
-		          <div class='grid-1'><label for='mcAPI'>MailChimp API Key <i class='icon-info-circled' ng-mouseover='tip = 2'></i></label></div>
-		          <div class='grid-2'><input type='text' name='mcAPI' placeholder='Enter your MailChimp API key.' ng-model='form.mcAPI'></div>
-		        </div>
+            <div class='form__field wrapper'>
+              <div class='grid-1'><label for='type'>Type</label></div>
+              <div class='grid-2'>
+                <input type='radio' name='type' value='retention' id='type-retention' ng-model='form.type'> <label for='type-retention'>Retention</label>
+                <input type='radio' name='type' value='acquisition' id='type-acquisition' ng-model='form.type'> <label for='type-acquisition'>Acquisition</label>
+              </div>
+            </div>
 
-		        <div class='form__field wrapper'>
-		          <div class='grid-1'><label for='mcID'>MailChimp Campaign ID <i class='icon-info-circled' ng-mouseover='tip = 3'></i></label></div>
-		          <div class='grid-2'><input type='text' name='mcID' placeholder='Enter the MailChimp campaign ID.' ng-model='form.mcID'></div>
-		        </div>
+            <div class='form__field wrapper'>
+              <div class='grid-1'><label for='path'>Path <em>ex. /example/path</em></label></div>
+              <div class='grid-2'><input type='text' name='path' placeholder='Enter the path of your URL.' ng-model='form.path'></div>
+            </div>
 
-		        <div class='form__field wrapper'>
-		          <div class='grid-1'><label for='path'>Path <em>ex. /example/path</em></label></div>
-		          <div class='grid-2'><input type='text' name='path' placeholder='Enter the path of your URL.' ng-model='form.path'></div>
-		        </div>
+            <div ng-switch='form.type'>
+              <div ng-switch-when='retention'>
+    		        <div class='form__field wrapper'>
+    		          <div class='grid-1'><label for='mcAPI'>MailChimp API Key</label></div>
+    		          <div class='grid-2'><input type='text' name='mcAPI' placeholder='Enter your MailChimp API key.' ng-model='form.mcAPI'></div>
+    		        </div>
+
+    		        <div class='form__field wrapper'>
+    		          <div class='grid-1'><label for='mcID'>MailChimp Campaign ID</label></div>
+    		          <div class='grid-2'><input type='text' name='mcID' placeholder='Enter the MailChimp campaign ID.' ng-model='form.mcID'></div>
+    		        </div>
+              </div>
+              <div ng-switch-when='acquisition'>
+                <div class='form__field wrapper'>
+                  <div class='grid-1'><label for='category'>GA Event Category</label></div>
+                  <div class='grid-2'><input type='text' name='category' placeholder='Enter the GA event category.' ng-model='form.category'></div>
+                </div>
+
+                <div class='form__field wrapper'>
+                  <div class='grid-1'><label for='action'>GA Event Action</label></div>
+                  <div class='grid-2'><input type='text' name='action' placeholder='Enter the GA event action.' ng-model='form.action'></div>
+                </div>
+
+                <div class='form__field wrapper'>
+                  <div class='grid-1'><label for='action'>GA Event Label</label></div>
+                  <div class='grid-2'><input type='text' name='label' placeholder='Enter the GA event label.' ng-model='form.label'></div>
+                </div>
+              </div>
+            </div>
 
 		        <div class='form__field wrapper'>
 		          <div class='grid-1'><label for='startDate'>Start Date</label></div>
@@ -102,28 +130,6 @@
 		        	</div>
 		       	</div>
 		      </div>
-
-	        <div class='grid-1'>
-	        	<div ng-switch='tip'>
-	        		<div ng-switch-when='1'>
-			        	<h3>GA View ID</h3>
-			        	<ol>
-			        		<li>Log in to your account &amp; click '<b>All Web Site Data</b>' under site's account.
-			        		<li>Then click the '<b>Admin</b>' link at the top of the page.
-			        		<li>Under the '<b>View</b>' column, select your view, then click '<b>View Settings</b>'
-			        	</ol>
-			        	<p>There you will find your 'View ID' listed.</p>
-			        </div>
-			        <div ng-switch-when='2'>
-			        	<h3>MailChimp API Key</h3>
-			        	<p>To find your MailChimp API Key, click <a href='https://admin.mailchimp.com/account/api-key-popup' target='_blank'>https://admin.mailchimp.com/account/api-key-popup</a>.</p>
-			        </div>
-			        <div ng-switch-when='3'>
-			        	<h3>MailChimp Campaign ID</h3>
-			        	<p>Unfortunately, they don't make it easy. Unless you're using the API or a system that provides you the campaign ID, you'll need to <a href='http://mailchimp.com/contact/campaign-id/' target='_blank'>follow these directions on MailChimp's website</a> to find the ID.
-			        </div>
-		        </div>
-	        </div>
 	      </div>
 
         <div class='wrapper form__notice'>
@@ -139,34 +145,54 @@
     <div class='grid-1'>
     	<h3>Statistics</h3>
     	<div class='wrapper stat'>
-    		<div class='grid-2'>Open Rate</div>
-    		<div class='grid-1'>{{ mcData.open_rate_formatted }}%</div>
-    	</div>
-    	<div class='wrapper stat'>
     		<div class='grid-2'>Average Time on Page</div>
-    		<div class='grid-1'>{{ gaData.avg_time_formatted }}</div>
+    		<div class='grid-1'>{{ gaData.pageviews.avg_time_formatted }}</div>
     	</div>
     	<div class='wrapper stat'>
     		<div class='grid-2'>Unique Pageviews</div>
-    		<div class='grid-1'>{{ gaData.unique_pageviews }}</div>
+    		<div class='grid-1'>{{ gaData.pageviews.unique_pageviews }}</div>
     	</div>
+      <div ng-switch='form.type'>
+        <div ng-switch-when='retention'>
+          <div class='wrapper stat'>
+            <div class='grid-2'>Open Rate</div>
+            <div class='grid-1'>{{ mcData.open_rate_formatted }}%</div>
+          </div>
+        </div>
+        <div ng-switch-when='acquisition'>
+          <div class='wrapper stat'>
+            <div class='grid-2'>Unique Events</div>
+            <div class='grid-1'>{{ gaData.events.unique_events }}</div>
+          </div>
+        </div>
+      </div>
 
     	<h3>Content Scores <em>(out of 50)</em></h3>
     	<div class='wrapper stat'>
-    		<div class='grid-2'>Open Rate Score</div>
-    		<div class='grid-1'>{{ retention.open_rate_score }}</div>
-    	</div>
-    	<div class='wrapper stat'>
     		<div class='grid-2'>Pageviews Score</div>
-    		<div class='grid-1'>{{ retention.pageviews_score }}</div>
+    		<div class='grid-1'>{{ score.pageviews }}</div>
     	</div>
     	<div class='wrapper stat'>
     		<div class='grid-2'>Time on Page Score</div>
-    		<div class='grid-1'>{{ retention.avg_time_score }}</div>
+    		<div class='grid-1'>{{ score.avg_time }}</div>
     	</div>
+      <div ng-switch='form.type'>
+        <div ng-switch-when='retention'>
+          <div class='wrapper stat'>
+            <div class='grid-2'>Open Rate Score</div>
+            <div class='grid-1'>{{ score.open_rate }}</div>
+          </div>
+        </div>
+        <div ng-switch-when='acquisition'>
+          <div class='wrapper stat'>
+            <div class='grid-2'>Events Score</div>
+            <div class='grid-1'>{{ score.events }}</div>
+          </div>
+        </div>
+      </div>
     	<div class='wrapper stat'>
     		<div class='grid-2'>Average Score</div>
-    		<div class='grid-1'>{{ retention.avg_score }}</div>
+    		<div class='grid-1'>{{ score.avg }}</div>
     	</div>
     </div>
   </div>

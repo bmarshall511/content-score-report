@@ -42,12 +42,23 @@ if( $method ) {
     case 'submitForm':
       $args = array(
         'viewID'    => isset( $_POST['viewID'] ) ? trim( strip_tags( $_POST['viewID'] ) ) : false,
-        'mcAPI'     => isset( $_POST['mcAPI'] ) ? trim( strip_tags( $_POST['mcAPI'] ) ) : false,
+        'type'      => isset( $_POST['type'] ) ? trim( strip_tags( $_POST['type'] ) ) : false,
         'path'      => isset( $_POST['path'] ) ? trim( strip_tags( $_POST['path'] ) ) : false,
-        'mcID'      => isset( $_POST['mcID'] ) ? trim( strip_tags( $_POST['mcID'] ) ) : false,
         'startDate' => isset( $_POST['startDate'] ) ? trim( strip_tags( $_POST['startDate'] ) ) : false,
         'endDate'   => isset( $_POST['endDate'] ) ? trim( strip_tags( $_POST['endDate'] ) ) : false
       );
+
+      switch( $args['type'] ) {
+        case 'retention':
+          $args['mcAPI'] = isset( $_POST['mcAPI'] ) ? trim( strip_tags( $_POST['mcAPI'] ) ) : false;
+          $args['mcID']  = isset( $_POST['mcID'] ) ? trim( strip_tags( $_POST['mcID'] ) ) : false;
+        break;
+        case 'acquisition':
+          $args['category'] = isset( $_POST['category'] ) ? trim( strip_tags( $_POST['category'] ) ) : false;
+          $args['action']   = isset( $_POST['action'] ) ? trim( strip_tags( $_POST['action'] ) ) : false;
+          $args['label']    = isset( $_POST['label'] ) ? trim( strip_tags( $_POST['label'] ) ) : false;
+        break;
+      }
 
       $return = $csr->getScore( $args );
     break;
