@@ -152,10 +152,10 @@
 
         switch( $scope.form.type ) {
           case "retention":
-            $scope.score.avg = ( ( ( data.score.open_rate * 0.35 ) + ( data.score.pageviews * 0.2 ) + ( data.score.avg_time * 0.45 ) ) / 3 ).toPrecision( 4 );
+            $scope.score.avg = ( ( ( data.score.open_rate * 0.35 ) + ( data.score.pageviews * 0.2 ) + ( data.score.avg_time * 0.45 ) ) );
           break;
           case "acquisition":
-            $scope.score.avg = ( ( ( data.score.events * 0.6 ) + ( data.score.pageviews * 0.2 ) + ( data.score.avg_time * 0.2 ) ) / 3 ).toPrecision( 4 );
+            $scope.score.avg = ( ( ( data.score.events * 0.6 ) + ( data.score.pageviews * 0.2 ) + ( data.score.avg_time * 0.2 ) ) );
           break;
         }
       });
