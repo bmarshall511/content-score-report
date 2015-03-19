@@ -4,6 +4,10 @@ Send emails through MailChimp when new articles are published? Get performance i
 
 ## Changelog
 
+### v1.1.1
+
+* Updated the average score to use a weighted average.
+
 ### v1.1.0
 
 * Implemented acquisition score functionality.
