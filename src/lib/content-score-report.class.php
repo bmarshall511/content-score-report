@@ -1,88 +1,97 @@
 <?php
+/**
+ * Content Score Report Class
+ *
+ * @version 1.2.0
+ */
 
 class Content_Score_Report {
-	var $client;
+  var $client;
   var $viewID;
   var $startDate;
   var $endDate;
   var $type;
 
-	public function __construct( $config ) {
-		$this->config = $config;
-	}
+  public function __construct( $config ) {
+    $this->config = $config;
+  }
 
-	public function checkConnections() {
-		$return = array(
-			'gaConnection' => false,
-			'mcConnection' => false,
-			'gaURL'        => false
-		);
+  public function checkConnections() {
+    $return = array(
+      'gaConnection' => false,
+      'mcConnection' => false,
+      'gaURL'        => false
+    );
 
-		// Connect to the GA API.
-		$result                 = $this->authenticateGA();
-		$return['gaConnection'] = $result['connected'];
-		$return['gaURL']        = $result['url'];
+    // Connect to the GA API.
+    $result                 = $this->authenticateGA();
+    $return['gaConnection'] = $result['connected'];
+    $return['gaURL']        = $result['url'];
 
-		return $return;
-	}
+    return $return;
+  }
 
-	public function deauthorizeGA() {
-		$_SESSION['access_token'] = false;
-		session_destroy();
-		$result = $this->authenticateGA();
-	}
+  public function deauthorizeGA() {
+    $_SESSION['access_token'] = false;
+    session_destroy();
+    $result = $this->authenticateGA();
+  }
 
-	public function authenticateGA( $code = false ) {
-		$return = array(
-			'connected' => false,
-			'url'       => false
-		);
+  public function authenticateGA( $code = false ) {
+    $return = array(
+      'connected' => false,
+      'url'       => false
+    );
 
-		$this->_gaConnect();
+    $this->_gaConnect();
 
-		if( $code ) {
-			$response = $this->client->authenticate( $code );
-			$_SESSION['access_token'] = $this->client->getAccessToken();
-		}
-
-		if( isset( $_SESSION['access_token'] ) && $_SESSION['access_token'] ) {
-			$this->client->setAccessToken( $_SESSION['access_token'] );
-
-			if( $this->client->isAccessTokenExpired() ) {
-      	/*$this->client->authenticate();
-      	$newToken = json_decode( $this->client->getAccessToken() );
-       	$this->client->refreshToken( $newToken->refresh_token );*/
-        $return['url'] = $this->client->createAuthUrl();
-    	} else {
-        $return['connected'] = true;
+    if ( $this->config['app_type'] === 'service' ) {
+       $return['connected'] = true;
+    } else {
+      if( $code ) {
+        $response = $this->client->authenticate( $code );
+        $_SESSION['access_token'] = $this->client->getAccessToken();
       }
-		} else {
-			$return['url'] = $this->client->createAuthUrl();
-		}
 
-		return $return;
-	}
+      if( isset( $_SESSION['access_token'] ) && $_SESSION['access_token'] ) {
+        $this->client->setAccessToken( $_SESSION['access_token'] );
 
-	public function getScore( $args ) {
+        if( $this->client->isAccessTokenExpired() ) {
+          /*$this->client->authenticate();
+          $newToken = json_decode( $this->client->getAccessToken() );
+          $this->client->refreshToken( $newToken->refresh_token );*/
+          $return['url'] = $this->client->createAuthUrl();
+        } else {
+          $return['connected'] = true;
+        }
+      } else {
+        $return['url'] = $this->client->createAuthUrl();
+      }
+    }
+
+    return $return;
+  }
+
+  public function getScore( $args ) {
     $this->viewID    = $args['viewID'];
     $this->startDate = $args['startDate'];
     $this->endDate   = $args['endDate'];
     $this->type      = $args['type'];
 
-		$return = array(
-			"errors" => array(),
-			"gaData" => array(),
-			"mcData" => array(),
-			"score"  => array()
-		);
+    $return = array(
+      "errors" => array(),
+      "gaData" => array(),
+      "mcData" => array(),
+      "score"  => array()
+    );
 
-		foreach( $args as $key => $val ) {
-			if( ! $val ) {
-				$return['errors'][] = "Missing required parameter: " . $key;
-			}
-		}
+    foreach( $args as $key => $val ) {
+      if( ! $val ) {
+        $return['errors'][] = "Missing required parameter: " . $key;
+      }
+    }
 
-		if( ! count( $return['errors'] ) ) {
+    if( ! count( $return['errors'] ) ) {
 
       // Get pageviews from Google Analytics.
       $result = $this->_gaCall( array( 'type' => 'pageviews', 'path' => $args['path'] ) );
@@ -140,15 +149,15 @@ class Content_Score_Report {
           }
         break;
       }
-	  }
+    }
 
-  	return $return;
-	}
+    return $return;
+  }
 
   private function _gaCall( $args ) {
     $return = array(
-      "errors"          => array(),
-      "data"          => array()
+      "errors" => array(),
+      "data"   => array()
     );
     $optParams = array();
 
@@ -192,7 +201,7 @@ class Content_Score_Report {
         $return['errors'][] = "Not connected to the Google API.";
       }
     } catch(Exception $e) {
-      $return['errors'][] = "There was an error : - " . $e->getMessage();
+      $return['errors'][] = "There was an error: " . $e->getMessage();
     }
 
     return $return;
@@ -326,63 +335,78 @@ class Content_Score_Report {
     return $return;
   }
 
-	private function _parseMCData( $data ) {
-		$return = array();
+  private function _parseMCData( $data ) {
+    $return = array();
 
-		$return['open_rate']           = $this->_calculateOpenRate( $data );
-		$return['open_rate_formatted'] = round( $return['open_rate'], 2 );
+    $return['open_rate']           = $this->_calculateOpenRate( $data );
+    $return['open_rate_formatted'] = round( $return['open_rate'], 2 );
 
-		return $return;
-	}
+    return $return;
+  }
 
-	private function _calculateOpenRate( $data ) {
-		$opened        = $data['unique_opens'];
-		$sent          = $data['emails_sent'];
-		$bounces       = $data['hard_bounces'] + $data['soft_bounces'];
-		$unsubscribes  = $data['unsubscribes'];
-		$abuse_reports = $data['abuse_reports'];
-		$invalid = $bounces + $unsubscribes + $abuse_reports;
+  private function _calculateOpenRate( $data ) {
+    $opened        = $data['unique_opens'];
+    $sent          = $data['emails_sent'];
+    $bounces       = $data['hard_bounces'] + $data['soft_bounces'];
+    $unsubscribes  = $data['unsubscribes'];
+    $abuse_reports = $data['abuse_reports'];
+    $invalid = $bounces + $unsubscribes + $abuse_reports;
 
-		return ( $opened / ( $sent - $invalid ) ) * 100;
-	}
+    return ( $opened / ( $sent - $invalid ) ) * 100;
+  }
 
-	private function _parseGAData( $data ) {
-		$return = array();
+  private function _parseGAData( $data ) {
+    $return = array();
 
-		foreach( $data as $key => $value ) {
-			switch( $key ) {
-				case "ga:uniquePageviews":
-					$key = "unique_pageviews";
-				break;
-				case "ga:avgTimeOnPage":
-					$key                          = "avg_time";
-					$return['avg_time_formatted'] = $this->_toTime( $value );
-				break;
+    foreach( $data as $key => $value ) {
+      switch( $key ) {
+        case "ga:uniquePageviews":
+          $key = "unique_pageviews";
+        break;
+        case "ga:avgTimeOnPage":
+          $key                          = "avg_time";
+          $return['avg_time_formatted'] = $this->_toTime( $value );
+        break;
         case "ga:uniqueEvents":
           $key = "unique_events";
         break;
-			}
+      }
 
-			$return[$key] = $value;
-		}
+      $return[$key] = $value;
+    }
 
-		return $return;
-	}
+    return $return;
+  }
 
-	private function _toTime( $secs ) {
-		$t = round( $secs );
-  	return sprintf('%02d:%02d:%02d', ($t/3600),($t/60%60), $t%60);
-	}
+  private function _toTime( $secs ) {
+    $t = round( $secs );
+    return sprintf('%02d:%02d:%02d', ($t/3600),($t/60%60), $t%60);
+  }
 
-	private function _gaConnect() {
-		$this->client = new Google_Client();
-		$this->client->setApplicationName( $this->config['app_name'] );
-		$this->client->setClientId( $this->config['client_id'] );
-		$this->client->setAccessType( "offline" );
-		$this->client->setClientSecret( $this->config['client_secret'] );
-		$this->client->setRedirectUri( $this->config['redirect_uri'] );
-		$this->client->setDeveloperKey( $this->config['key'] );
-		$this->client->setScopes( array( "https://www.googleapis.com/auth/analytics.readonly" ) );
-	}
+  private function _gaConnect() {
+    $this->client = new Google_Client();
+    $this->client->setApplicationName( $this->config['app_name'] );
+
+    if ( $this->config['app_type'] == 'service' ) {
+      $this->client->setAssertionCredentials(
+        new Google_Auth_AssertionCredentials(
+
+          // Google client ID email address
+          $this->config['email_address'],
+          array('https://www.googleapis.com/auth/analytics.readonly'),
+
+          // Downloaded client ID certificate file
+          file_get_contents( $this->config['private_key_file'] )
+        )
+      );
+    } else {
+      $this->client->setClientSecret( $this->config['client_secret'] );
+      $this->client->setRedirectUri( $this->config['redirect_uri'] );
+      $this->client->setDeveloperKey( $this->config['key'] );
+      $this->client->setScopes( array( "https://www.googleapis.com/auth/analytics.readonly" ) );
+    }
+
+    $this->client->setClientId( $this->config['client_id'] );
+    $this->client->setAccessType( "offline" );
+  }
 }
-

@@ -4,6 +4,10 @@ Send emails through MailChimp when new articles are published? Get performance i
 
 ## Changelog
 
+### v1.2.0
+
+* Enabled the option to use a Service credentials for the GA project.
+
 ### v1.1.1
 
 * Updated the average score to use a weighted average.
